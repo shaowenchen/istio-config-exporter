@@ -5,9 +5,13 @@ WORKDIR /build
 
 RUN apt-get update && apt-get install -y git make && rm -rf /var/lib/apt/lists/*
 
+# Copy go.mod/go.sum first so dependency download is cached when code changes
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -a -installsuffix cgo -o istio-config-exporter .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=mod -a -installsuffix cgo -o istio-config-exporter .
 
 FROM alpine:3.19
 
