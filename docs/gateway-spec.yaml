@@ -1,0 +1,37 @@
+# Gateway 典型定义 (networking.istio.io/v1beta1)
+# 请根据此结构指定需要导出为指标标签的字段（metadata / spec 均可）
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: my-gateway              # 资源名称
+  namespace: some-config-ns     # 命名空间
+  labels:                       # 标签（可选）
+    app: gateway
+  annotations:                  # 注解（可选）
+    # ...
+spec:
+  selector:                     # 选择承载该 Gateway 的 Pod
+    app: my-gateway-controller
+  servers:                      # 暴露的端口与协议
+    - port:
+        number: 80              # 端口号
+        name: http              # 端口名
+        protocol: HTTP          # 协议：HTTP、HTTPS、TCP、TLS、MONGO 等
+      hosts:
+        - uk.bookinfo.com       # 该端口绑定的 host，* 表示全部
+        - eu.bookinfo.com
+      tls:
+        httpsRedirect: true     # HTTP 重定向到 HTTPS（可选）
+    - port:
+        number: 443
+        name: https-443
+        protocol: HTTPS
+      hosts:
+        - uk.bookinfo.com
+        - eu.bookinfo.com
+      tls:
+        mode: SIMPLE            # SIMPLE / MUTUAL / PASSTHROUGH
+        credentialName: my-cert  # 证书 Secret 名（可选）
+        # serverCertificate: ... # 或直接写证书路径（可选）
+        # privateKey: ...

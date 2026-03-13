@@ -1,0 +1,37 @@
+# VirtualService 典型定义 (networking.istio.io/v1beta1)
+# 请根据此结构指定需要导出为指标标签的字段（metadata / spec 均可）
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: reviews-route          # 资源名称
+  namespace: default           # 命名空间
+  labels:                      # 标签（可选）
+    app: reviews
+  annotations:                 # 注解（可选）
+    # ...
+spec:
+  hosts:                       # 流量发往的目标 host，FQDN 或短名
+    - reviews.prod.svc.cluster.local
+  gateways:                    # 应用该路由的 gateway/sidecar（mesh 表示网格内）
+    - mesh
+    - some-ns/my-gateway
+  http:
+    - name: reviews-combined-routes
+      match:
+        - uri:
+            prefix: "/wpcatalog1"
+
+      # 核心：同一个路由，流量分给多个 service，按权重分担
+      route:
+        - destination:
+            host: reviews-v1.prod.svc.cluster.local   # 服务1
+          weight: 50                                   # 50% 流量
+
+        - destination:
+            host: reviews-v2.prod.svc.cluster.local   # 服务2
+          weight: 50 
+
+# 采集指标
+istio_config_virtualservice_spec_uri_host_weight{namespace="default",name="reviews-route", uri="/wpcatalog1", host="reviews-v1.prod.svc.cluster.local"} 50
+istio_config_virtualservice_spec_uri_host_weight{namespace="default",name="reviews-route", uri="/wpcatalog1", host="reviews-v2.prod.svc.cluster.local"} 50

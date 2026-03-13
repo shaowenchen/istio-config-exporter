@@ -1,0 +1,31 @@
+# ServiceEntry 典型定义 (networking.istio.io/v1beta1)
+# 请根据此结构指定需要导出为指标标签的字段（metadata / spec 均可）
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: external-svc-https      # 资源名称
+  namespace: default            # 命名空间
+  labels:                       # 标签（可选）
+    app: external
+  annotations:                  # 注解（可选）
+    # ...
+spec:
+  hosts:                        # 服务 host，DNS 或通配（如 *.example.com）
+    - api.dropboxapi.com
+    - www.googleapis.com
+  # addresses: ["192.192.192.192/24"]  # 虚拟 IP/CIDR（可选）
+  ports:                        # 端口列表
+    - number: 443
+      name: https
+      protocol: TLS             # HTTP、TCP、TLS、HTTPS、MONGO 等
+  location: MESH_EXTERNAL       # MESH_INTERNAL | MESH_EXTERNAL
+  resolution: DNS               # NONE | STATIC | DNS
+  # endpoints:                  # 静态端点（resolution=STATIC 时用，可选）
+  #   - address: 2.2.2.2
+  #   - address: 3.3.3.3
+  # exportTo: ["*"]             # 导出到的命名空间（可选）
+  # subjectAltNames: []         # mTLS 用 SAN（可选）
+  # workloadSelector:           # 用标签选择 Pod/VM 作为端点（可选）
+  #   labels:
+  #     app: details
