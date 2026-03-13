@@ -5,8 +5,8 @@ WORKDIR /build
 
 RUN apt-get update && apt-get install -y git make && rm -rf /var/lib/apt/lists/*
 
-# Copy go.mod/go.sum first so dependency download is cached when code changes
-COPY go.mod go.sum ./
+# Copy go.mod first so dependency download is cached when code changes (go.sum may be missing in repo)
+COPY go.mod ./
 RUN go mod download
 
 COPY . .
