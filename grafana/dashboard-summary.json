@@ -203,6 +203,7 @@
         "type": "datasource"
       },
       {
+        "allValue": ".*",
         "current": { "selected": true, "text": "", "value": "" },
         "datasource": { "type": "prometheus", "uid": "$datasource" },
         "definition": "label_values(istio_config_virtualservice_spec_uri_host_weight, cluster)",
@@ -220,6 +221,7 @@
         "type": "query"
       },
       {
+        "allValue": ".*",
         "current": { "selected": true, "text": "", "value": "" },
         "datasource": { "type": "prometheus", "uid": "$datasource" },
         "definition": "label_values(istio_config_virtualservice_spec_uri_host_weight{cluster=~\"$cluster\"}, exported_namespace)",
@@ -230,7 +232,7 @@
         "name": "namespace",
         "options": [],
         "query": { "query": "label_values(istio_config_virtualservice_spec_uri_host_weight{cluster=~\"$cluster\"}, exported_namespace)", "refId": "StandardVariableQuery" },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
         "sort": 1,
@@ -248,7 +250,7 @@
         "name": "name",
         "options": [],
         "query": { "query": "label_values(istio_config_virtualservice_spec_uri_host_weight{cluster=~\"$cluster\",exported_namespace=~\"$namespace\"}, name)", "refId": "StandardVariableQuery" },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
         "sort": 1,
