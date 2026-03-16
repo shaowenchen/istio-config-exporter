@@ -11,7 +11,7 @@
 ## 2. 按场景拆分导出
 
 - **只看概览**：可再起一个“汇总” exporter 或在本 collector 里增加**汇总类指标**（例如每 namespace 的 VS 数量、每 VS 的 route 数量），基数低、适合告警与大盘。
-- **看明细**：当前按 uri/host/weight、host/from/to/weight 的明细指标适合排障与审计；建议用 `-namespaces` 只对关键命名空间开明细，其余只看汇总。
+- **看明细**：当前按 uri_prefix/host/weight、host/from/to/weight 的明细指标适合排障与审计；建议用 `-namespaces` 只对关键命名空间开明细，其余只看汇总。
 
 ## 3. 命名与结构
 
@@ -29,7 +29,7 @@
 |----------------|------|
 | **汇总指标**   | 如 `istio_config_virtualservice_routes_total{namespace,name}` = 某 VS 的 route 条数，基数小，便于按 namespace/name 聚合与告警。 |
 | **uri 截断**   | 对 `uri` 标签长度做上限（如 128 字符），超长部分用 `...` 或 hash 代替，控制基数与可读性。 |
-| **采样/过滤**  | 对非关键 namespace 只导出汇总、不导出每条 uri/host/weight，或通过 `-namespaces` 完全排除。 |
+| **采样/过滤**  | 对非关键 namespace 只导出汇总、不导出每条 uri_prefix/host/weight，或通过 `-namespaces` 完全排除。 |
 | **Recording rules** | 在 Prometheus 用 recording rules 预聚合（如按 namespace 的 sum、count），查询与告警用预聚合结果，减少高基数查询。 |
 
 ## 6. 小结

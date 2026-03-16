@@ -9,7 +9,7 @@
   "panels": [
     {
       "datasource": { "type": "prometheus", "uid": "$datasource" },
-      "description": "Filter by cluster, namespace, name. Table: cluster, namespace, name, uri, host, weight.",
+      "description": "Filter by cluster, namespace, name. Table: cluster, namespace, name, uri_prefix, host, weight.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -63,7 +63,7 @@
             },
             "indexByName": {
               "cluster": 0,
-              "namespace": 1,
+              "exported_namespace": 1,
               "name": 2,
               "uri_prefix": 3,
               "host": 4,
@@ -122,14 +122,14 @@
       {
         "current": { "selected": true, "text": "", "value": "" },
         "datasource": { "type": "prometheus", "uid": "$datasource" },
-        "definition": "label_values(istio_config_virtualservice_spec_uri_host_weight, exported_namespace)",
+        "definition": "label_values(istio_config_virtualservice_spec_uri_host_weight{cluster=~\"$cluster\"}, exported_namespace)",
         "hide": 0,
         "includeAll": false,
         "label": "namespace",
         "multi": true,
         "name": "namespace",
         "options": [],
-        "query": { "query": "label_values(istio_config_virtualservice_spec_uri_host_weight, exported_namespace)", "refId": "StandardVariableQuery" },
+        "query": { "query": "label_values(istio_config_virtualservice_spec_uri_host_weight{cluster=~\"$cluster\"}, exported_namespace)", "refId": "StandardVariableQuery" },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -140,14 +140,14 @@
         "allValue": ".*",
         "current": { "selected": true, "text": "All", "value": "$__all" },
         "datasource": { "type": "prometheus", "uid": "$datasource" },
-        "definition": "label_values(istio_config_virtualservice_spec_uri_host_weight, name)",
+        "definition": "label_values(istio_config_virtualservice_spec_uri_host_weight{cluster=~\"$cluster\",exported_namespace=~\"$namespace\"}, name)",
         "hide": 0,
         "includeAll": true,
         "label": "name",
         "multi": true,
         "name": "name",
         "options": [],
-        "query": { "query": "label_values(istio_config_virtualservice_spec_uri_host_weight, name)", "refId": "StandardVariableQuery" },
+        "query": { "query": "label_values(istio_config_virtualservice_spec_uri_host_weight{cluster=~\"$cluster\",exported_namespace=~\"$namespace\"}, name)", "refId": "StandardVariableQuery" },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -159,7 +159,7 @@
   "time": { "from": "now-1h", "to": "now" },
   "timepicker": {},
   "timezone": "",
-  "title": "Istio Config — VirtualService (uri/host/weight)",
+  "title": "Istio Config — VirtualService (uri_prefix/host/weight)",
   "uid": "istio-config-virtualservice",
   "version": 1,
   "weekStart": ""

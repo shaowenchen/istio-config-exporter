@@ -4,7 +4,7 @@
 
 | 文件 | 资源 | 是否导出 |
 |------|------|----------|
-| [virtualservice-spec.yaml](virtualservice-spec.yaml) | VirtualService | 是（uri/host/weight） |
+| [virtualservice-spec.yaml](virtualservice-spec.yaml) | VirtualService | 是（uri_prefix/host/weight） |
 | [destinationrule-spec.yaml](destinationrule-spec.yaml) | DestinationRule | 是（host + locality distribute） |
 | [gateway-spec.yaml](gateway-spec.yaml) | Gateway | 否 |
 | [serviceentry-spec.yaml](serviceentry-spec.yaml) | ServiceEntry | 否 |
