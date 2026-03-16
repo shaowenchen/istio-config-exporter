@@ -103,12 +103,11 @@
             },
             "indexByName": {},
             "renameByName": {
-              "Value": "存在",
+              "Value": "Weight",
               "host": "Host",
               "name": "Name",
               "namespace": "Namespace",
-              "uri": "Uri",
-              "weight": "Weight"
+              "uri": "Uri"
             }
           }
         }

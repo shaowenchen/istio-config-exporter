@@ -36,11 +36,11 @@ var (
 	}
 )
 
-// VirtualService: one entry per (uri, host, weight) from spec.http[].route[]
+// VirtualService: one entry per (uri, host, weight); uri 为 "prefix:/path" / "exact:/path" / "regex:..." 或空
 type vsEntry struct {
-	uri   string
-	host  string
-	weight string
+	uri    string
+	host   string
+	weight float64 // 指标值 = weight
 }
 
 // DestinationRule: one entry per (from, to, weight) from localityLbSetting.distribute
@@ -135,8 +135,8 @@ func NewIstioConfigCollector(kubeconfig string, namespacesToScrape []string) (*I
 		stopCh:                stopCh,
 		virtualServiceSpecDesc: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, "", "virtualservice_spec_uri_host_weight"),
-			"VirtualService spec: uri (from http match), destination host, and route weight",
-			[]string{"namespace", "name", "uri", "host", "weight"},
+			"VirtualService spec: uri (prefix:/path or exact:/path or regex:...), destination host; value = route weight",
+			[]string{"namespace", "name", "uri", "host"},
 			nil,
 		),
 		destinationRuleSpecDesc: prometheus.NewDesc(
@@ -223,16 +223,19 @@ func parseVirtualServiceEntries(u *unstructured.Unstructured) []vsEntry {
 				continue
 			}
 			host := ""
-			weight := "100"
+			weight := 100.0
 			if dest, ok, _ := unstructured.NestedMap(rm, "destination"); ok && dest != nil {
 				if h, _ := dest["host"].(string); h != "" {
 					host = h
 				}
 			}
-			if w, ok := rm["weight"].(int64); ok {
-				weight = strconv.FormatInt(w, 10)
-			} else if w, ok := rm["weight"].(int); ok {
-				weight = strconv.Itoa(w)
+			switch w := rm["weight"].(type) {
+			case int64:
+				weight = float64(w)
+			case int:
+				weight = float64(w)
+			case float64:
+				weight = w
 			}
 			out = append(out, vsEntry{uri: uri, host: host, weight: weight})
 		}
@@ -352,13 +355,14 @@ func (c *IstioConfigCollector) Collect(ch chan<- prometheus.Metric) {
 		}
 		ns, name = sanitizeLabelValue(ns), sanitizeLabelValue(name)
 		for _, e := range entries {
-			uri, host, weight := sanitizeLabelValue(e.uri), sanitizeLabelValue(e.host), sanitizeLabelValue(e.weight)
-			dupKey := ns + "|" + name + "|" + uri + "|" + host + "|" + weight
+			uri := sanitizeLabelValue(e.uri)
+			host := sanitizeLabelValue(e.host)
+			dupKey := ns + "|" + name + "|" + uri + "|" + host + "|" + strconv.FormatFloat(e.weight, 'f', -1, 64)
 			if _, ok := seenVS[dupKey]; ok {
 				continue
 			}
 			seenVS[dupKey] = struct{}{}
-			ch <- prometheus.MustNewConstMetric(c.virtualServiceSpecDesc, prometheus.GaugeValue, 1, ns, name, uri, host, weight)
+			ch <- prometheus.MustNewConstMetric(c.virtualServiceSpecDesc, prometheus.GaugeValue, e.weight, ns, name, uri, host)
 		}
 	}
 

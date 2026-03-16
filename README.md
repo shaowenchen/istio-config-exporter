@@ -70,10 +70,10 @@ kubectl apply -f deploy/servicemonitor.yaml
 
 ## 指标（仅此两个）
 
-| 指标名                                                                                                  | 说明                                                           | Labels                             |
-| ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------- |
-| `istio_config_virtualservice_spec_uri_host_weight`                                                      | VirtualService 中 http 路由的 uri（match）、目标 host、权重    | namespace, name, uri, host, weight |
-| `istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight` | DestinationRule 的 host 与 locality 分发权重（value=权重数值） | namespace, name, host, from, to    |
+| 指标名                                                                                                  | 说明                                                           | Labels                                                                 | 指标值   |
+| ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------- | -------- |
+| `istio_config_virtualservice_spec_uri_host_weight`                                                      | VirtualService 中 http 路由的 uri（prefix:/path 等）+ host；value=权重 | namespace, name, uri, host                                            | weight % |
+| `istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight` | DestinationRule 的 host 与 locality 分发权重                   | namespace, name, host, from, to                                       | weight % |
 
 ### 使用示例
 

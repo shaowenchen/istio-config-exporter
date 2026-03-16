@@ -10,3 +10,7 @@
 | [serviceentry-spec.yaml](serviceentry-spec.yaml) | ServiceEntry | 否 |
 
 确定要导出的字段后，可根据上述 YAML 结构修改 collector 的指标与标签。
+
+## 大量 VS/DR 导出建议
+
+集群内 VirtualService、DestinationRule 很多时，可参考 [export-best-practices.md](export-best-practices.md) 控制基数、按命名空间过滤、以及可选汇总指标与 Recording rules 等做法。
