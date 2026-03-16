@@ -12,14 +12,14 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -a -installsuffix
 
 FROM alpine:3.19
 
-RUN apk --no-cache add ca-certificates && \
-    adduser -D -u 65534 appuser
+RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 COPY --from=builder /build/istio-config-exporter .
-RUN chown -R appuser:appuser /app
+# Alpine 已有 nobody (UID 65534)，直接使用
+RUN chown -R nobody:nobody /app
 
-USER appuser
+USER nobody
 
 EXPOSE 9102
 
