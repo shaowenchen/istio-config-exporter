@@ -35,10 +35,10 @@ spec:
             - --web.telemetry-path=/metrics
           resources:
             requests:
-              memory: "32Mi"
+              memory: "512Mi"
               cpu: "50m"
             limits:
-              memory: "128Mi"
+              memory: "1Gi"
               cpu: "200m"
           livenessProbe:
             httpGet:

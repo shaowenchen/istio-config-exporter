@@ -79,6 +79,21 @@ func (c *IstioConfigCollector) Stop() {
 
 func key(ns, name string) string { return ns + "/" + name }
 
+// sanitizeLabelValue 使标签值符合 Prometheus 规范：不含换行、双引号、反斜杠等，避免 /metrics 报错
+func sanitizeLabelValue(s string) string {
+	var b strings.Builder
+	b.Grow(len(s))
+	for _, r := range s {
+		switch r {
+		case '\n', '\r', '"', '\\':
+			b.WriteRune('_')
+		default:
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
 func (c *IstioConfigCollector) wantNamespace(ns string) bool {
 	if len(c.namespaces) == 0 {
 		return true
@@ -328,25 +343,42 @@ func (c *IstioConfigCollector) Collect(ch chan<- prometheus.Metric) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
+	seenVS := make(map[string]struct{})
 	for key, entries := range c.virtualServices {
 		parts := strings.SplitN(key, "/", 2)
 		ns, name := parts[0], ""
 		if len(parts) == 2 {
 			name = parts[1]
 		}
+		ns, name = sanitizeLabelValue(ns), sanitizeLabelValue(name)
 		for _, e := range entries {
-			ch <- prometheus.MustNewConstMetric(c.virtualServiceSpecDesc, prometheus.GaugeValue, 1, ns, name, e.uri, e.host, e.weight)
+			uri, host, weight := sanitizeLabelValue(e.uri), sanitizeLabelValue(e.host), sanitizeLabelValue(e.weight)
+			dupKey := ns + "|" + name + "|" + uri + "|" + host + "|" + weight
+			if _, ok := seenVS[dupKey]; ok {
+				continue
+			}
+			seenVS[dupKey] = struct{}{}
+			ch <- prometheus.MustNewConstMetric(c.virtualServiceSpecDesc, prometheus.GaugeValue, 1, ns, name, uri, host, weight)
 		}
 	}
 
+	seenDR := make(map[string]struct{})
 	for key, state := range c.destinationRuleStates {
 		parts := strings.SplitN(key, "/", 2)
 		ns, name := parts[0], ""
 		if len(parts) == 2 {
 			name = parts[1]
 		}
+		ns, name = sanitizeLabelValue(ns), sanitizeLabelValue(name)
+		host := sanitizeLabelValue(state.host)
 		for _, e := range state.entries {
-			ch <- prometheus.MustNewConstMetric(c.destinationRuleSpecDesc, prometheus.GaugeValue, e.weight, ns, name, state.host, e.from, e.to)
+			from, to := sanitizeLabelValue(e.from), sanitizeLabelValue(e.to)
+			dupKey := ns + "|" + name + "|" + host + "|" + from + "|" + to
+			if _, ok := seenDR[dupKey]; ok {
+				continue
+			}
+			seenDR[dupKey] = struct{}{}
+			ch <- prometheus.MustNewConstMetric(c.destinationRuleSpecDesc, prometheus.GaugeValue, e.weight, ns, name, host, from, to)
 		}
 	}
 }
