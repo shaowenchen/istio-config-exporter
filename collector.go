@@ -265,14 +265,14 @@ func parseDestinationRuleEntriesWithHost(u *unstructured.Unstructured) (host str
 	return host, entries
 }
 
-func (c *IstioConfigCollector) handleVirtualService(obj interface{}, delete bool) {
+func (c *IstioConfigCollector) handleVirtualService(obj interface{}, isDelete bool) {
 	u := extractUnstructured(obj)
 	if u == nil {
 		return
 	}
 	ns, name := u.GetNamespace(), u.GetName()
 	k := key(ns, name)
-	if delete {
+	if isDelete {
 		c.mu.Lock()
 		delete(c.virtualServices, k)
 		c.mu.Unlock()
@@ -291,14 +291,14 @@ func (c *IstioConfigCollector) handleVirtualService(obj interface{}, delete bool
 	c.mu.Unlock()
 }
 
-func (c *IstioConfigCollector) handleDestinationRule(obj interface{}, delete bool) {
+func (c *IstioConfigCollector) handleDestinationRule(obj interface{}, isDelete bool) {
 	u := extractUnstructured(obj)
 	if u == nil {
 		return
 	}
 	ns, name := u.GetNamespace(), u.GetName()
 	k := key(ns, name)
-	if delete {
+	if isDelete {
 		c.mu.Lock()
 		delete(c.destinationRuleStates, k)
 		c.mu.Unlock()

@@ -10,16 +10,16 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=vendor -a -installsuffix cgo -o istio-config-exporter .
 
-FROM alpine:3.19
+FROM ubuntu:22.04
 
-RUN apk --no-cache add ca-certificates
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY --from=builder /build/istio-config-exporter .
-# Alpine 已有 nobody (UID 65534)，直接使用
-RUN chown -R nobody:nobody /app
+# Ubuntu 已有 nobody (UID 65534)
+RUN chown -R 65534:65534 /app
 
-USER nobody
+USER 65534
 
 EXPOSE 9102
 
