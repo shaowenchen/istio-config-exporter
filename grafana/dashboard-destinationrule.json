@@ -9,7 +9,7 @@
   "panels": [
     {
       "datasource": { "type": "prometheus", "uid": "$datasource" },
-      "description": "Filter by namespace, cluster, name.",
+      "description": "Filter by cluster, namespace, name. Table: cluster, namespace, name, from, to, weight.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -25,7 +25,7 @@
         "cellHeight": "sm",
         "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
         "showHeader": true,
-        "sortBy": [{ "desc": false, "displayName": "Namespace" }]
+        "sortBy": [{ "desc": false, "displayName": "namespace" }]
       },
       "pluginVersion": "10.0.0",
       "targets": [
@@ -45,15 +45,37 @@
         {
           "id": "organize",
           "options": {
-            "excludeByName": { "Time": true },
-            "indexByName": {},
+            "excludeByName": {
+              "Time": true,
+              "host": true,
+              "__name__": true,
+              "instance": true,
+              "job": true,
+              "container": true,
+              "endpoint": true,
+              "cloud_provider_cod": true,
+              "cloud_provider_code": true,
+              "node": true,
+              "pod": true,
+              "prometheus": true,
+              "service": true,
+              "zone": true,
+              "namespace": true
+            },
+            "indexByName": {
+              "cluster": 0,
+              "namespace": 1,
+              "name": 2,
+              "from": 3,
+              "to": 4,
+              "weight": 5
+            },
             "renameByName": {
-              "Value": "Weight",
-              "from": "From",
-              "host": "Host",
-              "name": "Name",
-              "exported_namespace": "Namespace",
-              "to": "To"
+              "Value": "weight",
+              "from": "from",
+              "name": "name",
+              "exported_namespace": "namespace",
+              "to": "to"
             }
           }
         }
@@ -82,12 +104,11 @@
         "type": "datasource"
       },
       {
-        "allValue": ".*",
-        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "current": { "selected": true, "text": "", "value": "" },
         "datasource": { "type": "prometheus", "uid": "$datasource" },
         "definition": "label_values(istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight, cluster)",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": "cluster",
         "multi": true,
         "name": "cluster",
@@ -100,12 +121,11 @@
         "type": "query"
       },
       {
-        "allValue": ".*",
-        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "current": { "selected": true, "text": "", "value": "" },
         "datasource": { "type": "prometheus", "uid": "$datasource" },
         "definition": "label_values(istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight, exported_namespace)",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": "namespace",
         "multi": true,
         "name": "namespace",

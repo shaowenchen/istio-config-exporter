@@ -36,7 +36,7 @@ var (
 	}
 )
 
-// VirtualService: one entry per (uri, host, weight); uri 为 "prefix:/path" / "exact:/path" / "regex:..." 或空
+// VirtualService: one entry per (uri_prefix, host, weight); uri_prefix 为 path 值（来自 uri.prefix / uri.exact / uri.regex）或空
 type vsEntry struct {
 	uri    string
 	host   string
@@ -135,8 +135,8 @@ func NewIstioConfigCollector(kubeconfig string, namespacesToScrape []string) (*I
 		stopCh:                stopCh,
 		virtualServiceSpecDesc: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, "", "virtualservice_spec_uri_host_weight"),
-			"VirtualService spec: uri (prefix:/path or exact:/path or regex:...), destination host; value = route weight",
-			[]string{"namespace", "name", "uri", "host"},
+			"VirtualService spec: uri_prefix = /path (from uri.prefix, uri.exact, or uri.regex), destination host; value = route weight",
+			[]string{"namespace", "name", "uri_prefix", "host"},
 			nil,
 		),
 		destinationRuleSpecDesc: prometheus.NewDesc(
@@ -204,11 +204,11 @@ func parseVirtualServiceEntries(u *unstructured.Unstructured) []vsEntry {
 			if m, _ := matchSlice[0].(map[string]interface{}); m != nil {
 				if uu, ok := m["uri"].(map[string]interface{}); ok {
 					if p, _ := uu["prefix"].(string); p != "" {
-						uri = "prefix:" + p
+						uri = p
 					} else if e, _ := uu["exact"].(string); e != "" {
-						uri = "exact:" + e
+						uri = e
 					} else if r, _ := uu["regex"].(string); r != "" {
-						uri = "regex:" + r
+						uri = r
 					}
 				}
 			}
@@ -355,14 +355,14 @@ func (c *IstioConfigCollector) Collect(ch chan<- prometheus.Metric) {
 		}
 		ns, name = sanitizeLabelValue(ns), sanitizeLabelValue(name)
 		for _, e := range entries {
-			uri := sanitizeLabelValue(e.uri)
+			uriPrefix := sanitizeLabelValue(e.uri)
 			host := sanitizeLabelValue(e.host)
-			dupKey := ns + "|" + name + "|" + uri + "|" + host + "|" + strconv.FormatFloat(e.weight, 'f', -1, 64)
+			dupKey := ns + "|" + name + "|" + uriPrefix + "|" + host + "|" + strconv.FormatFloat(e.weight, 'f', -1, 64)
 			if _, ok := seenVS[dupKey]; ok {
 				continue
 			}
 			seenVS[dupKey] = struct{}{}
-			ch <- prometheus.MustNewConstMetric(c.virtualServiceSpecDesc, prometheus.GaugeValue, e.weight, ns, name, uri, host)
+			ch <- prometheus.MustNewConstMetric(c.virtualServiceSpecDesc, prometheus.GaugeValue, e.weight, ns, name, uriPrefix, host)
 		}
 	}
 

@@ -32,7 +32,7 @@ spec:
             host: reviews-v2.prod.svc.cluster.local   # 服务2
           weight: 50 
 
-# 采集指标（value = route weight；uri 为 prefix:/path / exact:/path / regex:... 或空）
-# Labels: namespace, name, uri, host
-istio_config_virtualservice_spec_uri_host_weight{namespace="default",name="reviews-route",uri="prefix:/wpcatalog1",host="reviews-v1.prod.svc.cluster.local"} 50
-istio_config_virtualservice_spec_uri_host_weight{namespace="default",name="reviews-route",uri="prefix:/wpcatalog1",host="reviews-v2.prod.svc.cluster.local"} 50
+# 采集指标（value = route weight；uri_prefix 为 path 值，如 /wpcatalog1，来自 uri.prefix / uri.exact / uri.regex）
+# Labels: namespace, name, uri_prefix, host
+istio_config_virtualservice_spec_uri_host_weight{namespace="default",name="reviews-route",uri_prefix="/wpcatalog1",host="reviews-v1.prod.svc.cluster.local"} 50
+istio_config_virtualservice_spec_uri_host_weight{namespace="default",name="reviews-route",uri_prefix="/wpcatalog1",host="reviews-v2.prod.svc.cluster.local"} 50

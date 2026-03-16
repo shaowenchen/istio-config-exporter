@@ -5,7 +5,7 @@
 ## 1. 控制基数（Cardinality）
 
 - **只采集需要的命名空间**：用 `-namespaces=prod,gateway` 等，避免全集群扫。
-- **标签值不要过长**：当前已对 `uri`、`host` 等做 sanitize；若 regex 非常长，可在 collector 里对长度做截断或只保留类型（如 `regex:<truncated>`），避免单条 label 值过长、序列数爆炸。
+- **标签值不要过长**：当前已对 `uri_prefix`、`host` 等做 sanitize；若 regex 非常长，可在 collector 里对长度做截断或只保留类型（如 `regex:<truncated>`），避免单条 label 值过长、序列数爆炸。
 - **关注序列总数**：VS 指标序列数 ≈ (VS 数 × 每条 VS 的 route 条数)；DR 序列数 ≈ (DR 数 × 各 DR 的 distribute 条数)。在 Prometheus 里用 `count(istio_config_virtualservice_spec_uri_host_weight)` 等评估，必要时用 `-namespaces` 或后续「汇总指标」做收敛。
 
 ## 2. 按场景拆分导出
@@ -15,7 +15,7 @@
 
 ## 3. 命名与结构
 
-- **统一用 snake_case 标签名**：如 `uri`、`host`、`namespace`、`name`，已符合。
+- **统一用 snake_case 标签名**：如 `uri_prefix`、`host`、`namespace`、`name`，已符合。
 - **指标值语义清晰**：VS 用 weight（百分比），DR 用 distribute weight，不混用“1 表示存在”的 info 与“数值表示权重”的 gauge，当前实现已区分。
 
 ## 4. 采集与存储
@@ -35,5 +35,5 @@
 ## 6. 小结
 
 - 用 **`-namespaces`** 收窄采集范围，是控制基数和成本最直接的方式。
-- 保持 **uri 单标签**（prefix:/path）、**指标值=weight**，不增加空的 uri_exact/uri_regex，便于查询和存储。
+- 保持 **uri_prefix** 单标签（值为 path，如 /path）、**指标值=weight**，不增加空的 uri_exact/uri_regex，便于查询和存储。
 - 大量配置时优先保障 **汇总类指标 + 关键 namespace 的明细**，再按需开全量明细并配合 Prometheus 的 retention/limit。

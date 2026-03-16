@@ -9,7 +9,7 @@
   "panels": [
     {
       "datasource": { "type": "prometheus", "uid": "$datasource" },
-      "description": "Filter by namespace, cluster, name.",
+      "description": "Filter by cluster, namespace, name. Table: cluster, namespace, name, uri, host, weight.",
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -25,7 +25,7 @@
         "cellHeight": "sm",
         "footer": { "countRows": false, "fields": "", "reducer": ["sum"], "show": false },
         "showHeader": true,
-        "sortBy": [{ "desc": false, "displayName": "Namespace" }]
+        "sortBy": [{ "desc": false, "displayName": "namespace" }]
       },
       "pluginVersion": "10.0.0",
       "targets": [
@@ -45,14 +45,36 @@
         {
           "id": "organize",
           "options": {
-            "excludeByName": { "Time": true },
-            "indexByName": {},
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "instance": true,
+              "job": true,
+              "container": true,
+              "endpoint": true,
+              "cloud_provider_cod": true,
+              "cloud_provider_code": true,
+              "node": true,
+              "pod": true,
+              "prometheus": true,
+              "service": true,
+              "zone": true,
+              "namespace": true
+            },
+            "indexByName": {
+              "cluster": 0,
+              "namespace": 1,
+              "name": 2,
+              "uri_prefix": 3,
+              "host": 4,
+              "weight": 5
+            },
             "renameByName": {
-              "Value": "Weight",
-              "host": "Host",
-              "name": "Name",
-              "exported_namespace": "Namespace",
-              "uri": "Uri"
+              "Value": "weight",
+              "host": "host",
+              "name": "name",
+              "exported_namespace": "namespace",
+              "uri_prefix": "uri_prefix"
             }
           }
         }
@@ -81,12 +103,11 @@
         "type": "datasource"
       },
       {
-        "allValue": ".*",
-        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "current": { "selected": true, "text": "", "value": "" },
         "datasource": { "type": "prometheus", "uid": "$datasource" },
         "definition": "label_values(istio_config_virtualservice_spec_uri_host_weight, cluster)",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": "cluster",
         "multi": true,
         "name": "cluster",
@@ -99,12 +120,11 @@
         "type": "query"
       },
       {
-        "allValue": ".*",
-        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "current": { "selected": true, "text": "", "value": "" },
         "datasource": { "type": "prometheus", "uid": "$datasource" },
         "definition": "label_values(istio_config_virtualservice_spec_uri_host_weight, exported_namespace)",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": "namespace",
         "multi": true,
         "name": "namespace",

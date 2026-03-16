@@ -72,7 +72,7 @@ kubectl apply -f deploy/servicemonitor.yaml
 
 | 指标名                                                                                                  | 说明                                                           | Labels                                                                 | 指标值   |
 | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------- | -------- |
-| `istio_config_virtualservice_spec_uri_host_weight`                                                      | VirtualService 中 http 路由的 uri（prefix:/path 等）+ host；value=权重 | namespace, name, uri, host                                            | weight % |
+| `istio_config_virtualservice_spec_uri_host_weight`                                                      | VirtualService 中 http 路由的 uri_prefix（path 如 /path）+ host；value=权重 | namespace, name, uri_prefix, host                                     | weight % |
 | `istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight` | DestinationRule 的 host 与 locality 分发权重                   | namespace, name, host, from, to                                       | weight % |
 
 ### 使用示例
@@ -95,7 +95,7 @@ sum by (host, from, to) (istio_config_destinationrule_spec_host_trafficpolicy_lo
 
 面板包含两个表格：
 
-- **VirtualService uri / host / weight**：namespace, name, uri, host, weight
+- **VirtualService uri / host / weight**：namespace, name, uri_prefix, host, weight
 - **DestinationRule locality distribute weight**：namespace, name, host, from, to, value(weight)
 
 变量：`datasource`（Prometheus 数据源）、`namespace`（命名空间筛选，多选）。
