@@ -58,6 +58,9 @@ kubectl apply -f deploy/servicemonitor.yaml
 
 访问 `http://localhost:9102/metrics` 查看指标。
 
+- **健康检查**：`/ready`（就绪）、`/live`（存活），Kubernetes 探针已配置为使用上述路径，避免用 `/metrics` 做健康检查。
+- **优雅退出**：收到 SIGTERM/SIGINT 时先停止 Informer 再关闭 HTTP 服务。
+
 命令行参数：
 
 - `-web.listen-address`: 监听地址（默认: `:9102`）

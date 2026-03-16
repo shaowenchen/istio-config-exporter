@@ -57,6 +57,7 @@ type IstioConfigCollector struct {
 	destinationRuleStates map[string]drState   // key: namespace/name
 
 	namespaces []string
+	stopCh     chan struct{} // closed on Stop() for graceful shutdown
 
 	virtualServiceSpecDesc  *prometheus.Desc
 	destinationRuleSpecDesc *prometheus.Desc
@@ -65,6 +66,15 @@ type IstioConfigCollector struct {
 type drState struct {
 	host    string
 	entries []drEntry
+}
+
+// Stop stops the informers. Call before process exit for clean shutdown.
+func (c *IstioConfigCollector) Stop() {
+	select {
+	case <-c.stopCh:
+	default:
+		close(c.stopCh)
+	}
 }
 
 func key(ns, name string) string { return ns + "/" + name }
@@ -102,10 +112,12 @@ func NewIstioConfigCollector(kubeconfig string, namespacesToScrape []string) (*I
 		return nil, err
 	}
 
+	stopCh := make(chan struct{})
 	c := &IstioConfigCollector{
 		virtualServices:       make(map[string][]vsEntry),
 		destinationRuleStates: make(map[string]drState),
 		namespaces:            namespacesToScrape,
+		stopCh:                stopCh,
 		virtualServiceSpecDesc: prometheus.NewDesc(
 			prometheus.BuildFQName(namespace, "", "virtualservice_spec_uri_host_weight"),
 			"VirtualService spec: uri (from http match), destination host, and route weight",
@@ -124,7 +136,6 @@ func NewIstioConfigCollector(kubeconfig string, namespacesToScrape []string) (*I
 	c.registerInformer(factory, virtualServiceGVR, c.handleVirtualService)
 	c.registerInformer(factory, destinationRuleGVR, c.handleDestinationRule)
 
-	stopCh := make(chan struct{})
 	factory.Start(stopCh)
 	if !cache.WaitForCacheSync(stopCh,
 		factory.ForResource(virtualServiceGVR).Informer().HasSynced,

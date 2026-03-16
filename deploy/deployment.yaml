@@ -42,18 +42,26 @@ spec:
               cpu: "200m"
           livenessProbe:
             httpGet:
-              path: /metrics
+              path: /live
               port: metrics
             initialDelaySeconds: 10
             periodSeconds: 30
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
-              path: /metrics
+              path: /ready
               port: metrics
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 5
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534  # appuser in image
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
 ---
 apiVersion: v1
 kind: Service
