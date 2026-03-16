@@ -27,7 +27,7 @@
         "type": "prometheus",
         "uid": "$datasource"
       },
-      "description": "Filter by cluster, namespace, name. Table: cluster, namespace, name, from, to, weight.",
+      "description": "Filter by cluster, namespace, name, from, to. Table: cluster, namespace, name, from, to, weight.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -54,7 +54,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
+        "h": 20,
         "w": 24,
         "x": 0,
         "y": 0
@@ -86,7 +86,7 @@
             "uid": "$datasource"
           },
           "editorMode": "code",
-          "expr": "istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight{exported_namespace=~\"$namespace\",cluster=~\"$cluster\",name=~\"$name\"}",
+          "expr": "istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight{exported_namespace=~\"$namespace\",cluster=~\"$cluster\",name=~\"$name\",from=~\"$from\",to=~\"$to\"}",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
@@ -263,6 +263,62 @@
         "options": [],
         "query": {
           "query": "label_values(istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight{cluster=~\"$cluster\",exported_namespace=~\"$namespace\"}, name)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "$datasource"
+        },
+        "definition": "label_values(istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight{cluster=~\"$cluster\",exported_namespace=~\"$namespace\",name=~\"$name\"}, from)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "from",
+        "multi": true,
+        "name": "from",
+        "options": [],
+        "query": {
+          "query": "label_values(istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight{cluster=~\"$cluster\",exported_namespace=~\"$namespace\",name=~\"$name\"}, from)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "$datasource"
+        },
+        "definition": "label_values(istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight{cluster=~\"$cluster\",exported_namespace=~\"$namespace\",name=~\"$name\",from=~\"$from\"}, to)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "to",
+        "multi": true,
+        "name": "to",
+        "options": [],
+        "query": {
+          "query": "label_values(istio_config_destinationrule_spec_host_trafficpolicy_loadbalancer_localitylbsetting_distribute_weight{cluster=~\"$cluster\",exported_namespace=~\"$namespace\",name=~\"$name\",from=~\"$from\"}, to)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
