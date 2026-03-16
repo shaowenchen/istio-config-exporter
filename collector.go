@@ -237,6 +237,9 @@ func parseVirtualServiceEntries(u *unstructured.Unstructured) []vsEntry {
 			case float64:
 				weight = w
 			}
+			if uri == "" {
+				continue
+			}
 			out = append(out, vsEntry{uri: uri, host: host, weight: weight})
 		}
 	}
