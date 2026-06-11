@@ -223,7 +223,7 @@ func parseVirtualServiceEntries(u *unstructured.Unstructured) []vsEntry {
 				continue
 			}
 			host := ""
-			weight := 100.0
+			weight := 0.0
 			if dest, ok, _ := unstructured.NestedMap(rm, "destination"); ok && dest != nil {
 				if h, _ := dest["host"].(string); h != "" {
 					host = h
